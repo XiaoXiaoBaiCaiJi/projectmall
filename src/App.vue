@@ -1,7 +1,10 @@
 <template>
-  <div id="app">
-    <router-view></router-view>
-    <mainTabbar></mainTabbar>
+  <div id="app" class="wrapper">
+    <keep-alive exclude="Detail">
+      <router-view/>
+    </keep-alive>
+    <mainTabbar/>
+
   </div>
 </template>
 
