@@ -1,11 +1,11 @@
 <template>
   <div id="home">
     <NavBar class="home-nav"><div slot="center">Fshop</div></NavBar>
-    <tab-control :titles="['流行','新款','精选']"
-                 @tabClick="tabClick"
-                 ref="tabControlOffset1"
-                 class="tab-control"
-                 v-show="isTabFixed"/>
+      <tab-control :titles="['流行','新款','精选']"
+                              @tabClick="tabClick"
+                              ref="tabControlOffset1"
+                              class="tab-control"
+                              v-show="isTabFixed"/>
     <Scroll class="content"
                 ref="scroll"
                 :probe-type="3"
@@ -35,12 +35,14 @@
 
   import {getHomeMultidata, getHomeGoods} from 'network/home';
   import {debounce} from "common/utils";
+  // import {itemListenerMixin} from "common/mixin";
 
   import Scroll from 'components/common/scroll/Scroll'
   import BackTop from 'components/content/backtop/BackTop'
 
   export default {
     name: "Home",
+    // mixins:[itemListenerMixin],
     components: {
       NavBar,
       TabControl,
@@ -67,6 +69,7 @@
         tabOffsetTop: 0,
         isTabFixed: false,
         saveY: 0,
+        itemImgListener: null,
       }
     },
     created() {
@@ -79,12 +82,13 @@
 
     },
     mounted() {
-      const refresh = debounce(this.$refs.scroll.refresh,200)
+      const Refresh = debounce(this.$refs.scroll.refresh,200)
       //监听事件总线
-      this.$bus.$on('itemImageLoad', () => {
-        refresh();
-        // console.log('---------'); refresh函数好像没有起作用
-      })
+      this.itemImgListener = () => {
+        // console.log('---------'); //refresh函数好像没有起作用
+        Refresh();
+      }
+      this.$bus.$on('itemImageLoad', this.itemImgListener)
       //获取tabControl的offsetTop
       //所有组件中都有一个属性$el：用于获取组件中的元素
       // this.tabOffsetTop = this.$refs.tabControl
@@ -171,7 +175,11 @@
         this.$refs.scroll.scrollTo(0, this.saveY, 0);
       },
       deactivated() {
+        //保存Y值
         this.saveY = this.$refs.scroll.getScrollY();
+
+        //取消全局事件的监听
+        this.$bus.$off('itemImgLoad',this.itemImgListener)
       }
     }
   }

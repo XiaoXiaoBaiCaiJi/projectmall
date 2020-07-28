@@ -24,7 +24,7 @@
 
 <script>
   export default {
-    name: "DetailGoodsInfo",
+    name: "DetailShowGoodsInfo",
     props: {
       goodsInfo: {
         type: Object,
